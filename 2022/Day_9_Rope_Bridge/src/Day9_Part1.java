@@ -11,7 +11,7 @@ public class Day9_Part1 {
     private static int yTailCoordinate = 500;
 
     public static void main(String[] args) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new FileReader("C:/Users/harsh/Desktop/IIITs/Advent of Code/2022/Input/Day_9.txt"));
+        BufferedReader bufferedReader = new BufferedReader(new FileReader("C:/Users/harsh/Desktop/Harsh/Advent of Code/2022/Input/Day_9.txt"));
 
         String line;
         while ((line = bufferedReader.readLine()) != null) {
