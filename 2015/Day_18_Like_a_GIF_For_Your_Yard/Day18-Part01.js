@@ -1,27 +1,88 @@
-function countCombinations(target, containers) {
-    let memo = {};
+const fs = require('fs');
 
-    function countHelper(target, index) {
-        if (target === 0) return 1;
-        if (target < 0 || index >= containers.length) return 0;
+// ^ means the light will turn on next state, but is off in current state.
+// v means the light will turn off next state, but is on in current state.
 
-        if (memo.hasOwnProperty(`${target}-${index}`)) {
-            return memo[`${target}-${index}`];
+function getNeighbors(grid, x, y) {
+    let neighbors = [];
+    let directions = [
+        [-1, -1], [-1, 0], [-1, 1],
+        [0, -1], [0, 1],
+        [1, -1], [1, 0], [1, 1]
+    ];
+
+    for (let [dx, dy] of directions) {
+        let nx = x + dx;
+        let ny = y + dy;
+        if (nx >= 0 && nx < grid.length && ny >= 0 && ny < grid[0].length) {
+            neighbors.push(grid[nx][ny]);
         }
-
-        let includeCurrent = countHelper(target - containers[index], index + 1);
-        let excludeCurrent = countHelper(target, index + 1);
-
-        let total = includeCurrent + excludeCurrent;
-        memo[`${target}-${index}`] = total;
-
-        return total;
     }
 
-    return countHelper(target, 0);
+    return neighbors;
 }
 
-const containers = [50, 44, 11, 49, 42, 46, 18, 32, 26, 40, 21, 7, 18, 43, 10, 47, 36, 24, 22, 40];
-const target = 150;
+function countOccurrences(array, value) {
+    return array.filter(element => element === value).length;
+}
 
-console.log(`Number of combinations: ${countCombinations(target, containers)}`);
+function updateLightState(grid, x, y) {
+    let neighbors = getNeighbors(grid, x, y);
+    let countOn = countOccurrences(neighbors, "#") + countOccurrences(neighbors, "v");
+    if (grid[x][y] === "#" || grid[x][y] === "v") {
+        if (countOn !== 2 && countOn !== 3) {
+            grid[x][y] = "v";
+        }
+    } else if (grid[x][y] === "." || grid[x][y] === "^") {
+        if (countOn === 3) {
+            grid[x][y] = "^";
+        }
+    }
+}
+
+function lightsON(input) {
+    let grid = input.trim().split("\r\n").map(line => line.split(''));
+    let steps = 100;
+    let gridSize = 100;
+
+    while (steps--) {
+        for (let x = 0; x < gridSize; x++) {
+            for (let y = 0; y < gridSize; y++) {
+                updateLightState(grid, x, y);
+            }
+        }
+
+        for (let x = 0; x < gridSize; x++) {
+            for (let y = 0; y < gridSize; y++) {
+                if (grid[x][y] === "^") {
+                    grid[x][y] = "#";
+                } else if (grid[x][y] === "v") {
+                    grid[x][y] = ".";
+                }
+            }
+        }
+    }
+
+    let countOn = 0;
+    for (let x = 0; x < gridSize; x++) {
+        for (let y = 0; y < gridSize; y++) {
+            if (grid[x][y] === "#") {
+                countOn++;
+            }
+        }
+    }
+
+    // return grid.map(row => row.join('')).join('\r\n')
+    return countOn;
+}
+
+
+const filePath = 'Day18.txt';
+fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+        console.error('Error reading the file:', err);
+        return;
+    }
+
+    console.log(lightsON(data));
+});
