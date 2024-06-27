@@ -19,7 +19,7 @@ function parseInput(input) {
 
     descriptions.forEach(description => {
         description = description.trim();
-        const regex = /^Sue \d+: (.+)$/; // Regex to match "Car 1: " and capture the rest
+        const regex = /^Sue \d+: (.+)$/;
         const match = description.match(regex);
 
         if (match) {
